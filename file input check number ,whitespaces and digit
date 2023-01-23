@@ -1,0 +1,72 @@
+#include <bits/stdc++.h>
+using namespace std;
+/* run this program using the console pauser or add your own getch, system("pause") or input loop */
+
+bool isNum(string s)
+{
+	for(int i=0;i<s.size();i++)
+	{
+		if(!isdigit(s[i]) && s[i]!=' ' && s[i]!='.' && s[i]!=';')return false;
+	}
+	return true;
+}
+
+bool isWord(string s)
+{
+	for(int i=0;i<s.size();i++)
+	{
+		if((s[i]>!'a' && s[i]<!'z') && s[i]!=' ' && s[i]!=';')return false;
+	}
+	return true;
+}
+
+int main(int argc, char** argv) {
+	ifstream myfile("input.txt");
+    string s;
+    if(myfile.is_open()){
+    	while(myfile){
+    		getline(myfile,s);
+		}
+	}
+//	getline(cin,s);
+	vector<string> numbers,words,waste;
+	int whiteSpaces=0;
+	for(int i=0;i<s.size();i++){
+		int ind=i;
+		while(true){
+		   if(s[i]==' '){
+		   	whiteSpaces++;
+		   	break;
+		   }
+		   else if(s[i]==';')break;
+		   else i++;
+		}
+		string t = s.substr(ind,i-ind);
+		if(isNum(t))numbers.push_back(t);
+		else if(isWord(t))words.push_back(t);
+		else waste.push_back(t);
+	}
+	
+	cout<<"Number of White Spaces are: "<<whiteSpaces<<endl;
+	cout<<"Number of numbers are: "<<numbers.size()<<endl;
+	cout<<"Valid Numbers are: ";
+	for(int i=0;i<numbers.size();i++)
+	{
+		cout<<numbers[i]<<" ";
+	}
+	cout<<endl;
+	cout<<"Number of words are: "<<words.size()<<endl;
+		cout<<"Valid words are: ";
+	for(int i=0;i<words.size();i++)
+	{
+		cout<<words[i]<<" ";
+	}
+	cout<<endl;	
+		cout<<"Waste words are: ";
+	for(int i=0;i<waste.size();i++)
+	{
+		cout<<waste[i]<<" ";
+	}
+	cout<<endl;	
+	return 0;
+}
