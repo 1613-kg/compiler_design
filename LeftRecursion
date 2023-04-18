@@ -1,0 +1,83 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+void removeLeftRec(string s)
+{
+    string alpha;
+    vector<string> beta;
+    for (int i = 3; i < s.size(); i++)
+    {
+        if (s[i] != '|')
+            alpha.push_back(s[i]);
+        else
+            break;
+    }
+    int fp = s.find_first_of('|');
+    string temp;
+    for (int i = fp + 1; i < s.size(); i++)
+    {
+        if (s[i] != '|')
+            temp.push_back(s[i]);
+        else
+        {
+            //temp.push_back('|');
+            beta.push_back(temp);
+            temp = "";
+        }
+    }
+    beta.push_back(temp);
+    string second;
+    second.push_back(s[0]);
+    second.push_back('-');
+    second.push_back('$');
+    second.push_back('|');
+    second+=alpha;
+    second.push_back(s[0]);
+    second.push_back('\'');
+    string first;
+    first.push_back(s[0]);
+    first.push_back('-');
+    for (auto &x : beta)
+    {
+        first += x;
+        first.push_back(s[0]);
+        first.push_back('\'');
+        first.push_back('|');
+    }
+    first.pop_back();
+    cout << first << endl;
+    cout << second << endl;
+}
+
+int main()
+{
+    cout << "Enter number of productions: "<<endl;
+    int n;
+    cin >> n;
+    vector<string> v(n);
+    for (int i = 0; i < n; i++)
+    {
+        //cout << "Enter your " << i+1 << " production: "<<endl;
+        cin >> v[i];
+    }
+    int flag = 0;
+    for (auto &x : v)
+    {
+        if (x.size() < 3)
+        {
+            cout << x << " is invalid production" << endl;
+            continue;
+        }
+        else if (x[0] == x[2])
+        {
+            flag = 1;
+            cout << x << " production contains left recursion." << endl;
+            cout << "Production after removal of left recursion: " << endl;
+            removeLeftRec(x);
+            continue;
+        }
+    }
+    if (!flag)
+        cout << "NO Left recursion found in the given grammar." << endl;
+    return 0;
+}
