@@ -1,0 +1,136 @@
+#include <iostream>
+#include <queue>
+#include <set>
+#include <tuple>
+
+using namespace std;
+
+// Define the state of the problem
+using State = tuple<int, int, int, int, int, int>;
+
+// Function to check if a state is valid
+bool isValid(int m1, int c1, int b1, int m2, int c2, int b2) {
+    return (m1 >= 0 && c1 >= 0 && m2 >= 0 && c2 >= 0 &&
+            (m1 == 0 || m1 >= c1) &&
+            (m2 == 0 || m2 >= c2));
+}
+
+// Function to check if a state is the goal state
+bool isGoal(int m1, int c1, int b1, int m2, int c2, int b2) {
+    return (m1 == 0 && c1 == 0 && b1 == 0 && m2 == 3 && c2 == 3 && b2 == 1);
+}
+
+// Function to generate successor states
+vector<State> successors(int m1, int c1, int b1, int m2, int c2, int b2) {
+    vector<State> succ;
+
+    if (b1 == 1) {
+        // Move missionaries
+        for (int i = 0; i <= 2; ++i) {
+            for (int j = 0; j <= 2; ++j) {
+                if (i + j >= 1 && i + j <= 2 && isValid(m1 - i, c1 - j, 0, m2 + i, c2 + j, 1)) {
+                    succ.push_back(make_tuple(m1 - i, c1 - j, 0, m2 + i, c2 + j, 1));
+                }
+            }
+        }
+
+        // Move cannibals
+        for (int i = 0; i <= 2; ++i) {
+            for (int j = 0; j <= 2; ++j) {
+                if (i + j >= 1 && i + j <= 2 && isValid(m1, c1 - i, 0, m2, c2 + i, 1)) {
+                    succ.push_back(make_tuple(m1, c1 - i, 0, m2, c2 + i, 1));
+                }
+            }
+        }
+
+        // Move both missionaries and cannibals
+        for (int i = 0; i <= 1; ++i) {
+            for (int j = 0; j <= 1; ++j) {
+                if (i + j >= 1 && i + j <= 2 && isValid(m1 - i, c1 - j, 0, m2 + i, c2 + j, 1)) {
+                    succ.push_back(make_tuple(m1 - i, c1 - j, 0, m2 + i, c2 + j, 1));
+                }
+            }
+        }
+    } else {
+        // Move missionaries
+        for (int i = 0; i <= 2; ++i) {
+            for (int j = 0; j <= 2; ++j) {
+                if (i + j >= 1 && i + j <= 2 && isValid(m1 + i, c1 + j, 1, m2 - i, c2 - j, 0)) {
+                    succ.push_back(make_tuple(m1 + i, c1 + j, 1, m2 - i, c2 - j, 0));
+                }
+            }
+        }
+
+        // Move cannibals
+        for (int i = 0; i <= 2; ++i) {
+            for (int j = 0; j <= 2; ++j) {
+                if (i + j >= 1 && i + j <= 2 && isValid(m1, c1 + i, 1, m2, c2 - i, 0)) {
+                    succ.push_back(make_tuple(m1, c1 + i, 1, m2, c2 - i, 0));
+                }
+            }
+        }
+
+        // Move both missionaries and cannibals
+        for (int i = 0; i <= 1; ++i) {
+            for (int j = 0; j <= 1; ++j) {
+                if (i + j >= 1 && i + j <= 2 && isValid(m1 + i, c1 + j, 1, m2 - i, c2 - j, 0)) {
+                    succ.push_back(make_tuple(m1 + i, c1 + j, 1, m2 - i, c2 - j, 0));
+                }
+            }
+        }
+    }
+
+    return succ;
+}
+
+// Breadth-First Search function
+void solveMissionaryCannibal() {
+    int m1, c1, b1, m2, c2, b2;
+
+    // Get initial state from the user
+    cout << "Enter the initial state (format: M1 C1 B1 M2 C2 B2): ";
+    cin >> m1 >> c1 >> b1 >> m2 >> c2 >> b2;
+
+    // Validate initial state
+    if (!isValid(m1, c1, b1, m2, c2, b2)) {
+        cout << "Invalid initial state. Please ensure the constraints are satisfied.\n";
+        return;
+    }
+
+    queue<State> q;
+    set<State> visited;
+
+    // Initial state
+    State initial = make_tuple(m1, c1, b1, m2, c2, b2);
+    q.push(initial);
+    visited.insert(initial);
+
+    while (!q.empty()) {
+        State current = q.front();
+        q.pop();
+
+        tie(m1, c1, b1, m2, c2, b2) = current;
+
+        // Check if the current state is the goal state
+        if (isGoal(m1, c1, b1, m2, c2, b2)) {
+            cout << "Solution found!\n";
+            break;
+        }
+
+        // Generate successor states
+        vector<State> succ = successors(m1, c1, b1, m2, c2, b2);
+
+        // Explore successors
+        for (const auto& next : succ) {
+            if (visited.find(next) == visited.end()) {
+                q.push(next);
+                visited.insert(next);
+            }
+        }
+    }
+}
+
+int main() {
+    solveMissionaryCannibal();
+    return 0;
+}
